@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
+    <title>EduWish — учебный вишлист</title>
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/base_adaptive.css">
+    <link rel="stylesheet" href="styles/index.css">
+    <link rel="stylesheet" href="styles/index_adaptive.css">
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <a class="header-brand" href="index.html">
+            <div class="header-logo">E</div>
+            <div class="header-title">EduWish</div>
+        </a>
+        <nav class="header-menu">
+            <a class="header-link" href="wishlist.html">Добавить цель</a>
+            <a class="header-link" href="matching.html">Мои запросы</a>
+        </nav>
+    </header>
+
+    <main class="main main-centered">
+        <div class="main-info centered">
+            <div class="main-title">
+                <span>E</span>duWish
+            </div>
+            <div class="main-features">
+                <div class="main-feature">Учебный вишлист</div>
+                <div class="main-feature">P2P-обмен</div>
+                <div class="main-feature">Геймификация</div>
+                <div class="main-feature">Каталог ресурсов</div>
+                <div class="main-feature">Рейтинг и баллы</div>
+            </div>
+            <div class="main-description">
+                Виртуальный список желаний для обучения. Собирайте цели, находите ресурсы в библиотеке вуза и обменивайтесь с другими студентами.
+            </div>
+            <div class="main-actions">
+                <a class="button button-large" href="wishlist.html">Создать учебную цель</a>
+                <a class="button button-white button-large" href="matching.html">Найти совпадения</a>
+            </div>
+
+            <!-- Блок быстрого поиска (заметные поля ввода) -->
+            <div class="quick-search">
+                <div class="quick-search-title">Быстрый поиск ресурса</div>
+                <div class="quick-search-fields">
+                    <div class="main-field highlighted-field">
+                        <input type="text" id="quickResource" placeholder="Название книги, курса или статьи">
+                    </div>
+                    <button id="quickSearchBtn" class="button button-large">Найти</button>
+                </div>
+                <div id="quickResult" class="quick-result"></div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    // Простая демо-функция для быстрого поиска
+    document.getElementById('quickSearchBtn')?.addEventListener('click', () => {
+        const query = document.getElementById('quickResource').value.trim();
+        const resultDiv = document.getElementById('quickResult');
+        if (!query) {
+            resultDiv.innerHTML = '<span style="color: #7C7C7C;">Введите название ресурса</span>';
+            return;
+        }
+        resultDiv.innerHTML = `🔍 Ищем "${query}" в библиотеке и среди студентов...<br>
+        <span style="font-size: 12px;">✅ Найдено 3 совпадения. Перейдите в раздел "Мои запросы" для деталей.</span>`;
+    });
+</script>
+</body>
+</html>

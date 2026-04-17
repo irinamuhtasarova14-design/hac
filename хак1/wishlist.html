@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
+    <title>Добавить учебную цель — EduWish</title>
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/base_adaptive.css">
+    <link rel="stylesheet" href="styles/order.css">
+    <link rel="stylesheet" href="styles/order_adaptive.css">
+</head>
+
+<body>
+
+    <header class="header">
+        <a class="header-brand" href="index.html">
+            <div class="header-logo">E</div>
+            <div class="header-title">EduWish</div>
+        </a>
+        <nav class="header-menu">
+            <a class="header-link" href="wishlist.html"> <span>Добавить цель</span></a>
+            <a class="header-link" href="matching.html"> <span>Мои запросы</span></a>
+        </nav>
+    </header>
+
+    <aside class="main" id="sidebar">
+        <div class="main-header">
+            <div class="main-title">Новая учебная цель</div>
+            <div class="main-text">Что вы хотите найти? Книгу, курс, статью или конспект</div>
+        </div>
+        <div class="main-content">
+            <!-- Тип ресурса (аналог размеров посылки) -->
+            <div class="main-package">
+                <div class="main-block-title">Тип ресурса</div>
+                <div class="main-sizes">
+                    <div class="main-size-card is-active" data-type="book">
+                        <div class="main-size-top">
+                            <div class="main-size-label"> Книга</div>
+                            <div class="main-size-rate">+10 баллов</div>
+                        </div>
+                        <div class="main-size-media"></div>
+                        <div class="main-size-description">Учебник, монография, справочник</div>
+                    </div>
+                    <div class="main-size-card" data-type="course">
+                        <div class="main-size-top">
+                            <div class="main-size-label"> Курс</div>
+                            <div class="main-size-rate">+20 баллов</div>
+                        </div>
+                        <div class="main-size-media"></div>
+                        <div class="main-size-description">Видеокурс, лекции, вебинар</div>
+                    </div>
+                    <div class="main-size-card" data-type="article">
+                        <div class="main-size-top">
+                            <div class="main-size-label"> Статья</div>
+                            <div class="main-size-rate">+5 баллов</div>
+                        </div>
+                        <div class="main-size-media"></div>
+                        <div class="main-size-description">Научная статья, обзор</div>
+                    </div>
+                    <div class="main-size-card" data-type="notes">
+                        <div class="main-size-top">
+                            <div class="main-size-label"> Конспект</div>
+                            <div class="main-size-rate">+15 баллов</div>
+                        </div>
+                        <div class="main-size-media"></div>
+                        <div class="main-size-description">Конспекты, шпаргалки, тезисы</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Приоритет (аналог скорости доставки) -->
+            <div class="main-speed">
+                <div class="main-block-title">Приоритет запроса</div>
+                <div class="main-speeds">
+                    <div class="main-speed-card is-active" data-priority="normal">
+                        <div class="main-speed-media"></div>
+                        <div class="main-speed-description">Обычный</div>
+                    </div>
+                    <div class="main-speed-card" data-priority="high">
+                        <div class="main-speed-media"></div>
+                        <div class="main-speed-description">Срочный (+30 баллов)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Название ресурса -->
+            <div class="main-route">
+                <div class="main-block-title">Что ищете?</div>
+                <div class="main-fields">
+                    <div class="main-field">
+                        <input id="resourceName" placeholder="Название книги, курса или статьи" autocomplete="off">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Дополнительно: автор/ссылка -->
+            <div class="main-route">
+                <div class="main-block-title">Автор / ссылка (необязательно)</div>
+                <div class="main-fields">
+                    <div class="main-field">
+                        <input id="author" placeholder="Автор или URL" autocomplete="off">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Кнопка "Добавить цель" (вместо "Рассчитать") -->
+            <div class="main-calculate-block">
+                <button id="addGoalBtn" class="button calculate-button" type="button">Добавить цель</button>
+            </div>
+
+            <!-- Блок с результатом (баллы, статус) -->
+            <div class="main-result" id="result" style="display: none;">
+                <div class="main-result-title"> Цель добавлена!</div>
+                <div class="main-result-lines">
+                    <div class="main-result-line"><span>Тип</span><span id="typeValue">—</span></div>
+                    <div class="main-result-line"><span>Приоритет</span><span id="priorityValue">—</span></div>
+                    <div class="main-result-line"><span>Статус</span><span> В поиске</span></div>
+                </div>
+                <div class="main-price">
+                    <div class="main-price-label">Начислено баллов</div>
+                    <div class="main-price-value" id="pointsValue">0</div>
+                </div>
+            </div>
+
+            <!-- Список текущих целей (вишлист) -->
+            <div class="main-order-box">
+                <div class="main-order-title">📋 Мой вишлист</div>
+                <div id="wishlistContainer">
+                    <div class="main-field" style="justify-content: center; color: #7C7C7C;">Пока нет целей. Добавьте
+                        первую!</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <script>
+        // Эмуляция локального хранилища для вишлиста
+        let wishlist = JSON.parse(localStorage.getItem('eduWishlist')) || [];
+
+        function renderWishlist() {
+            const container = document.getElementById('wishlistContainer');
+            if (!container) return;
+            if (wishlist.length === 0) {
+                container.innerHTML = '<div class="main-field" style="justify-content: center; color: #7C7C7C;">Пока нет целей. Добавьте первую!</div>';
+                return;
+            }
+            container.innerHTML = wishlist.map((item, idx) => `
+            <div class="main-field" style="justify-content: space-between;">
+                <span><strong>${escapeHtml(item.name)}</strong> (${item.typeLabel})</span>
+                <span style="color: #DC6133;">${item.priority === 'high' ? ' Срочно' : ' Обычный'}</span>
+                <button class="remove-wish" data-idx="${idx}" style="background: none; border: none; cursor: pointer;">❌</button>
+            </div>
+        `).join('');
+            // Добавляем обработчики удаления
+            document.querySelectorAll('.remove-wish').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const idx = parseInt(btn.dataset.idx);
+                    wishlist.splice(idx, 1);
+                    localStorage.setItem('eduWishlist', JSON.stringify(wishlist));
+                    renderWishlist();
+                    // также скрываем блок результата, если нужно
+                    document.getElementById('result').style.display = 'none';
+                });
+            });
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/[&<>]/g, function (m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // Переключение типа ресурса
+        const sizeCards = document.querySelectorAll('.main-size-card');
+        let selectedType = 'book';
+        sizeCards.forEach(card => {
+            card.addEventListener('click', () => {
+                sizeCards.forEach(c => c.classList.remove('is-active'));
+                card.classList.add('is-active');
+                selectedType = card.dataset.type;
+            });
+        });
+
+        // Переключение приоритета
+        const speedCards = document.querySelectorAll('.main-speed-card');
+        let selectedPriority = 'normal';
+        speedCards.forEach(card => {
+            card.addEventListener('click', () => {
+                speedCards.forEach(c => c.classList.remove('is-active'));
+                card.classList.add('is-active');
+                selectedPriority = card.dataset.priority;
+            });
+        });
+
+        // Добавление цели
+        const addBtn = document.getElementById('addGoalBtn');
+        const resourceInput = document.getElementById('resourceName');
+        const authorInput = document.getElementById('author');
+        const resultBlock = document.getElementById('result');
+        const typeSpan = document.getElementById('typeValue');
+        const prioritySpan = document.getElementById('priorityValue');
+        const pointsSpan = document.getElementById('pointsValue');
+
+        const typeLabels = {
+            book: 'Книга',
+            course: 'Курс',
+            article: 'Статья',
+            notes: 'Конспект'
+        };
+
+        addBtn.addEventListener('click', () => {
+            const name = resourceInput.value.trim();
+            if (!name) {
+                alert('Введите название ресурса');
+                return;
+            }
+            const typeLabel = typeLabels[selectedType] || 'Книга';
+            let points = 0;
+            switch (selectedType) {
+                case 'book': points = 10; break;
+                case 'course': points = 20; break;
+                case 'article': points = 5; break;
+                case 'notes': points = 15; break;
+            }
+            if (selectedPriority === 'high') points += 30;
+
+            const newGoal = {
+                name: name,
+                type: selectedType,
+                typeLabel: typeLabel,
+                priority: selectedPriority,
+                author: authorInput.value.trim(),
+                points: points,
+                createdAt: new Date().toISOString()
+            };
+            wishlist.push(newGoal);
+            localStorage.setItem('eduWishlist', JSON.stringify(wishlist));
+            renderWishlist();
+
+            // Показать результат
+            typeSpan.innerText = typeLabel;
+            prioritySpan.innerText = selectedPriority === 'high' ? 'Срочный' : 'Обычный';
+            pointsSpan.innerText = points;
+            resultBlock.style.display = 'block';
+
+            // Очистить поля
+            resourceInput.value = '';
+            authorInput.value = '';
+
+            // Через 3 секунды скрыть блок результата
+            setTimeout(() => {
+                resultBlock.style.display = 'none';
+            }, 4000);
+        });
+
+        // Инициализация
+        renderWishlist();
+    </script>
+</body>
+
+</html>

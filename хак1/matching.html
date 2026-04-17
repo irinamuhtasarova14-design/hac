@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
+    <title>Мои запросы и матчинг — EduWish</title>
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/base_adaptive.css">
+    <link rel="stylesheet" href="styles/track.css">
+    <link rel="stylesheet" href="styles/track_adaptive.css">
+</head>
+
+<body>
+   <div class="container" style="background: #F4F4F4;">
+        <header class="header">
+            <a class="header-brand" href="index.html">
+                <div class="header-logo">E</div>
+                <div class="header-title">EduWish</div>
+            </a>
+            <nav class="header-menu">
+                <a class="header-link" href="wishlist.html"> <span>Добавить цель</span></a>
+                <a class="header-link" href="matching.html"> <span>Мои запросы</span></a>
+            </nav>
+        </header>
+
+        <main class="track-content">
+            <!-- Поиск запроса по ID (как отслеживание посылки) -->
+            <section class="track-card track-search">
+                <div class="track-title">🔍 Найти совпадения по запросу</div>
+                <div class="track-action">
+                    <div class="main-field track-field">
+                        <input id="requestId" placeholder="Введите ID запроса (например, #EDU-001)" autocomplete="off">
+                    </div>
+                    <button id="matchSearchBtn" class="button track-button" type="button">Найти матчинг</button>
+                </div>
+            </section>
+
+            <!-- Результаты матчинга (аналог статусов посылки) -->
+            <section class="track-card track-result" id="trackResult">
+                <div class="track-result-header">
+                    <div class="track-id" id="requestTitle">📌 Запрос: #EDU-001</div>
+                    <div class="track-routes">
+                        <div class="track-route">
+                            <div class="track-route-pin">📖</div>
+                            <div class="track-route-address" id="resourceNameDisplay">Название: «Машинное обучение»
+                            </div>
+                        </div>
+                        <div class="track-route track-route-arrow">
+                            <span style="font-size: 20px;">⬇️</span>
+                        </div>
+                        <div class="track-route">
+                            <div class="track-route-pin">🎯</div>
+                            <div class="track-route-address" id="matchResultDisplay">Ищется в библиотеке и P2P...</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="track-info">
+                    <div class="track-status-title">Статус запроса:</div>
+                    <div class="track-status-list" id="statusList">
+                        <!-- Динамически заполняется -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Эмуляция базы данных запросов (на основе вишлиста из localStorage)
+        function getRequestsFromWishlist() {
+            const wishlist = JSON.parse(localStorage.getItem('eduWishlist')) || [];
+            return wishlist.map((item, idx) => ({
+                id: `EDU-${String(idx + 1).padStart(3, '0')}`,
+                name: item.name,
+                type: item.type,
+                priority: item.priority,
+                createdAt: item.createdAt || new Date().toISOString(),
+                status: 'searching' // searching, found, completed
+            }));
+        }
+
+        let allRequests = getRequestsFromWishlist();
+
+        function updateStatusDisplay(requestId) {
+            const request = allRequests.find(r => r.id === requestId);
+            if (!request) return;
+
+            document.getElementById('requestTitle').innerText = `📌 Запрос: ${request.id}`;
+            document.getElementById('resourceNameDisplay').innerHTML = `Название: «${escapeHtml(request.name)}»`;
+
+            // Эмуляция матчинга: если запрос создан менее минуты назад, то "в поиске", иначе "найдено"
+            let statusText = '';
+            let statusSteps = [];
+            const createdDate = new Date(request.createdAt);
+            const now = new Date();
+            const diffSeconds = (now - createdDate) / 1000;
+
+            if (diffSeconds < 10) {
+                statusText = '🔍 Идёт поиск в фондах вуза и среди студентов...';
+                statusSteps = [
+                    { name: 'Запрос создан', date: createdDate, active: true },
+                    { name: 'Поиск в библиотеке', date: null, active: false },
+                    { name: 'P2P-матчинг', date: null, active: false }
+                ];
+            } else if (diffSeconds < 30) {
+                statusText = '✅ Найдено совпадение! Книга есть в библиотеке.';
+                statusSteps = [
+                    { name: 'Запрос создан', date: createdDate, active: true },
+                    { name: 'Поиск в библиотеке', date: new Date(createdDate.getTime() + 5000), active: true },
+                    { name: 'P2P-матчинг', date: null, active: false }
+                ];
+            } else {
+                statusText = '🎉 Готов к обмену! Найден студент, готовый поделиться ресурсом.';
+                statusSteps = [
+                    { name: 'Запрос создан', date: createdDate, active: true },
+                    { name: 'Поиск в библиотеке', date: new Date(createdDate.getTime() + 5000), active: true },
+                    { name: 'P2P-матчинг', date: new Date(createdDate.getTime() + 15000), active: true }
+                ];
+            }
+
+            document.getElementById('matchResultDisplay').innerHTML = statusText;
+
+            // Генерация списка статусов
+            const statusContainer = document.getElementById('statusList');
+            statusContainer.innerHTML = statusSteps.map((step, i) => `
+            <div class="track-status ${step.active ? (i === 0 ? 'created' : (i === 1 ? 'in-way' : 'ready')) : ''}">
+                <div class="track-status-icon">${step.active ? '✅' : '⏳'}</div>
+                <div class="track-status-text">
+                    <div class="track-status-text-state">${step.name}</div>
+                    <div class="track-status-text-date">${step.date ? step.date.toLocaleString() : '—'}</div>
+                </div>
+            </div>
+        `).join('');
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/[&<>]/g, function (m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // Поиск по ID
+        document.getElementById('matchSearchBtn').addEventListener('click', () => {
+            const inputId = document.getElementById('requestId').value.trim().toUpperCase();
+            if (!inputId) {
+                alert('Введите ID запроса (например, EDU-001)');
+                return;
+            }
+            const found = allRequests.find(r => r.id === inputId);
+            if (found) {
+                document.getElementById('trackResult').classList.add('is-visible');
+                updateStatusDisplay(inputId);
+            } else {
+                alert('Запрос не найден. Сначала добавьте цель на странице вишлиста.');
+            }
+        });
+
+        // При загрузке показываем первый запрос, если есть
+        window.addEventListener('load', () => {
+            allRequests = getRequestsFromWishlist();
+            if (allRequests.length > 0) {
+                document.getElementById('trackResult').classList.add('is-visible');
+                updateStatusDisplay(allRequests[0].id);
+                document.getElementById('requestId').value = allRequests[0].id;
+            } else {
+                document.getElementById('trackResult').classList.remove('is-visible');
+            }
+        });
+    </script>
+</body>
+
+</html>
